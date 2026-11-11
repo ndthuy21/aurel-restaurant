@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Optional Amplify Git-connected Next.js frontend
+Parameters:
+  RepositoryUrl: { Type: String, Description: 'HTTPS URL of your GitHub repository' }
+  GitHubToken:
+    {
+      Type: String,
+      NoEcho: true,
+      Description: 'GitHub token authorized for this repository; do not commit it',
+    }
+  BranchName: { Type: String, Default: main }
+  ApiUrl: { Type: String }
+  CognitoClientId: { Type: String }
+  CognitoUserPoolId: { Type: String }
+Resources:
+  AmplifyLogRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: amplify.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub 'arn:${AWS::Partition}:amplify:${AWS::Region}:${AWS::AccountId}:apps/*'
+      Policies:
+        - PolicyName: AmplifySSRLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: logs:DescribeLogGroups
+                Resource: '*'
+              - Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/amplify/*'
+  App:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: aurel-restaurant
+      Repository: !Ref RepositoryUrl
+      AccessToken: !Ref GitHubToken
+      Platform: WEB_COMPUTE
+      IAMServiceRole: !GetAtt AmplifyLogRole.Arn
+      BuildSpec: |
+        version: 1
+        frontend:
+          phases:
+            preBuild:
+              commands:
+                - nvm install 22
+                - corepack enable
+                - pnpm install --frozen-lockfile
+            build:
+              commands:
+                - node scripts/amplify-env.mjs
+                - pnpm build
+          artifacts:
+            baseDirectory: .next
+            files: ['**/*']
+          cache:
+            paths: ['node_modules/**/*', '.next/cache/**/*']
+      EnvironmentVariables:
+        - { Name: DATA_MODE, Value: aws }
+        - { Name: API_BASE_URL, Value: !Ref ApiUrl }
+        - { Name: NEXT_PUBLIC_API_BASE_URL, Value: !Ref ApiUrl }
+        - { Name: COGNITO_CLIENT_ID, Value: !Ref CognitoClientId }
+        - { Name: COGNITO_USER_POOL_ID, Value: !Ref CognitoUserPoolId }
+        - { Name: APP_AWS_REGION, Value: !Ref 'AWS::Region' }
+  Branch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      AppId: !GetAtt App.AppId
+      BranchName: !Ref BranchName
+      Framework: Next.js - SSR
+      Stage: PRODUCTION
+      EnableAutoBuild: true
+      EnvironmentVariables:
+        - Name: APP_ORIGIN
+          Value: !Sub 'https://${BranchName}.${App.DefaultDomain}'
+Outputs:
+  AppId: { Value: !GetAtt App.AppId }
+  FrontendOrigin: { Value: !Sub 'https://${BranchName}.${App.DefaultDomain}' }

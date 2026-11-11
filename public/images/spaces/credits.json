@@ -1,0 +1,162 @@
+[
+  {
+    "id": "bamboo-lights",
+    "src": "/images/spaces/bamboo-lights.webp",
+    "thumb": "/images/spaces/bamboo-lights-small.webp",
+    "width": 1600,
+    "height": 1200,
+    "title": "Sắc mây tre, ánh đèn ấm",
+    "type": "Không gian",
+    "alt": "Không gian nhà hàng Việt với đèn đan mây tre, bàn ghế gỗ và tranh trang trí.",
+    "photo": {
+      "title": "HK KTD 九龍灣 Kln Bay 德福廣場 Telford Plaza mall 餐廳 restaurant 錦麗 Phole Vietnamese interior decor lamps January 2023 Px3 01.jpg",
+      "author": "FOOWU Hoyallopaxrmii",
+      "source": "https://commons.wikimedia.org/wiki/File:HK_KTD_%E4%B9%9D%E9%BE%8D%E7%81%A3_Kln_Bay_%E5%BE%B7%E7%A6%8F%E5%BB%A3%E5%A0%B4_Telford_Plaza_mall_%E9%A4%90%E5%BB%B3_restaurant_%E9%8C%A6%E9%BA%97_Phole_Vietnamese_interior_decor_lamps_January_2023_Px3_01.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/0/04/HK_KTD_%E4%B9%9D%E9%BE%8D%E7%81%A3_Kln_Bay_%E5%BE%B7%E7%A6%8F%E5%BB%A3%E5%A0%B4_Telford_Plaza_mall_%E9%A4%90%E5%BB%B3_restaurant_%E9%8C%A6%E9%BA%97_Phole_Vietnamese_interior_decor_lamps_January_2023_Px3_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "modifications": "Resized and converted to WebP. Display may crop to fit the layout.",
+    "sha256": "d085b1a5602bb80614c69e27131e6ae91202cc14fb7ffb069fa9664002c9f41e"
+  },
+  {
+    "id": "garden-house",
+    "src": "/images/spaces/garden-house.webp",
+    "thumb": "/images/spaces/garden-house-small.webp",
+    "width": 1600,
+    "height": 901,
+    "title": "Một hiên nhà giữa cây xanh",
+    "type": "Không gian",
+    "alt": "Nhà hàng bằng gỗ giữa cây xanh tại Phố Trúc, Ecopark.",
+    "photo": {
+      "title": "Wooden restaurant in Pho Truc, Ecopark in 2014.jpg",
+      "author": "Vuong Tri Binh",
+      "source": "https://commons.wikimedia.org/wiki/File:Wooden_restaurant_in_Pho_Truc,_Ecopark_in_2014.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/52/Wooden_restaurant_in_Pho_Truc%2C_Ecopark_in_2014.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "modifications": "Resized and converted to WebP. Display may crop to fit the layout.",
+    "sha256": "6d72ec9cef3caeb9dce61d7114d744bb8b3cc0de64f931fa2294d280817fc147"
+  },
+  {
+    "id": "lantern-terrace",
+    "src": "/images/spaces/lantern-terrace.webp",
+    "thumb": "/images/spaces/lantern-terrace-small.webp",
+    "width": 1600,
+    "height": 1067,
+    "title": "Những sắc đèn lồng",
+    "type": "Không gian",
+    "alt": "Hiên nhà hàng với đèn lồng nhiều màu, hoa và chậu cây.",
+    "photo": {
+      "title": "20230724 172652 July 2023 in Łódź.jpg",
+      "author": "Rakoon",
+      "source": "https://commons.wikimedia.org/wiki/File:20230724_172652_July_2023_in_%C5%81%C3%B3d%C5%BA.jpg",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en"
+    },
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f1/20230724_172652_July_2023_in_%C5%81%C3%B3d%C5%BA.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "modifications": "Resized and converted to WebP. Display may crop to fit the layout.",
+    "sha256": "2358723774eaa8a922e079c4cb7f516643d2c3357d4e1cf6a0efa8d094c12c37"
+  },
+  {
+    "id": "sunlit-table",
+    "src": "/images/spaces/sunlit-table.webp",
+    "thumb": "/images/spaces/sunlit-table-small.webp",
+    "width": 1200,
+    "height": 1600,
+    "title": "Nắng ghé bên bàn gỗ",
+    "type": "Chi tiết",
+    "alt": "Bàn gỗ có bộ ấm chén, bình hoa và vệt nắng bên tường gạch.",
+    "photo": {
+      "title": "Cafe Lối Xưa, đường Gò Dầu, Tân Phú, tháng 9 năm 2018 (12).jpg",
+      "author": "Phương Huy  ( thảo luận )",
+      "source": "https://commons.wikimedia.org/wiki/File:Cafe_L%E1%BB%91i_X%C6%B0a,_%C4%91%C6%B0%E1%BB%9Dng_G%C3%B2_D%E1%BA%A7u,_T%C3%A2n_Ph%C3%BA,_th%C3%A1ng_9_n%C4%83m_2018_(12).jpg",
+      "license": "Public domain",
+      "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/"
+    },
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Cafe_L%E1%BB%91i_X%C6%B0a%2C_%C4%91%C6%B0%E1%BB%9Dng_G%C3%B2_D%E1%BA%A7u%2C_T%C3%A2n_Ph%C3%BA%2C_th%C3%A1ng_9_n%C4%83m_2018_%2812%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "modifications": "Resized and converted to WebP. Display may crop to fit the layout.",
+    "sha256": "22213dfe3404c52e1172fe0a3fd6300399047a946de8c7ac67121f25190ac340"
+  },
+  {
+    "id": "brick-corner",
+    "src": "/images/spaces/brick-corner.webp",
+    "thumb": "/images/spaces/brick-corner-small.webp",
+    "width": 1233,
+    "height": 1600,
+    "title": "Một góc gạch mộc",
+    "type": "Không gian",
+    "alt": "Bàn ghế mây trong góc tường gạch với ánh sáng chiếu ngang.",
+    "photo": {
+      "title": "Cafe Lối Xưa, đường Gò Dầu, Tân Phú, tháng 9 năm 2018 (13).jpg",
+      "author": "Phương Huy  ( thảo luận )",
+      "source": "https://commons.wikimedia.org/wiki/File:Cafe_L%E1%BB%91i_X%C6%B0a,_%C4%91%C6%B0%E1%BB%9Dng_G%C3%B2_D%E1%BA%A7u,_T%C3%A2n_Ph%C3%BA,_th%C3%A1ng_9_n%C4%83m_2018_(13).jpg",
+      "license": "Public domain",
+      "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/"
+    },
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/7/73/Cafe_L%E1%BB%91i_X%C6%B0a%2C_%C4%91%C6%B0%E1%BB%9Dng_G%C3%B2_D%E1%BA%A7u%2C_T%C3%A2n_Ph%C3%BA%2C_th%C3%A1ng_9_n%C4%83m_2018_%2813%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "modifications": "Resized and converted to WebP. Display may crop to fit the layout.",
+    "sha256": "299c55799b7616be22ad37436a61c8c1a99a7bd4896780d1dc2de266432d84df"
+  },
+  {
+    "id": "shared-table",
+    "src": "/images/spaces/shared-table.webp",
+    "thumb": "/images/spaces/shared-table-small.webp",
+    "width": 1600,
+    "height": 901,
+    "title": "Bên nhau trong một bữa cơm",
+    "type": "Không gian",
+    "alt": "Bàn ăn thấp với đệm ngồi, bát đũa và mâm món Việt.",
+    "photo": {
+      "title": "Hmong specialities restaurant in Ha Giang city in 2014 04.jpg",
+      "author": "Vuong Tri Binh",
+      "source": "https://commons.wikimedia.org/wiki/File:Hmong_specialities_restaurant_in_Ha_Giang_city_in_2014_04.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/3/35/Hmong_specialities_restaurant_in_Ha_Giang_city_in_2014_04.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "modifications": "Resized and converted to WebP. Display may crop to fit the layout.",
+    "sha256": "f90fed458319e59188f5b625f889e7c6bf28fa6a1c934539699354d4855acd47"
+  },
+  {
+    "id": "warm-lamp",
+    "src": "/images/spaces/warm-lamp.webp",
+    "thumb": "/images/spaces/warm-lamp-small.webp",
+    "width": 1067,
+    "height": 1600,
+    "title": "Ánh đèn dịu, câu chuyện dài",
+    "type": "Chi tiết",
+    "alt": "Đèn bàn ánh vàng, bình hoa và bàn ăn trong không gian trầm ấm.",
+    "photo": {
+      "title": "Le Bordeaux - French Restaurant HCMC (Vietnam).jpg",
+      "author": "ZAC",
+      "source": "https://commons.wikimedia.org/wiki/File:Le_Bordeaux_-_French_Restaurant_HCMC_(Vietnam).jpg",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+    },
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Le_Bordeaux_-_French_Restaurant_HCMC_%28Vietnam%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "modifications": "Resized and converted to WebP. Display may crop to fit the layout.",
+    "sha256": "b0f92765fc98c89bfc256a610c76ee1fd42a97666bb9cff5ed004d95dfd83af0"
+  },
+  {
+    "id": "wooden-dining-room",
+    "src": "/images/spaces/wooden-dining-room.webp",
+    "thumb": "/images/spaces/wooden-dining-room-small.webp",
+    "width": 1600,
+    "height": 1065,
+    "title": "Bàn gỗ mở ra khoảng sáng",
+    "type": "Không gian",
+    "alt": "Phòng ăn mở với dãy bàn ghế gỗ, trần gỗ và nền gạch đỏ.",
+    "photo": {
+      "title": "Restaurace u moře - panoramio (1137).jpg",
+      "author": "linhvan",
+      "source": "https://commons.wikimedia.org/wiki/File:Restaurace_u_mo%C5%99e_-_panoramio_(1137).jpg",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0"
+    },
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Restaurace_u_mo%C5%99e_-_panoramio_%281137%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "modifications": "Resized and converted to WebP. Display may crop to fit the layout.",
+    "sha256": "2e3f9cad9092c94c986469e6d90379c166163972a325e7c035ce2e8a482cf886"
+  }
+]

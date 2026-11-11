@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.env*
+!.env.example
+.data/
+dist/
+.aws-sam/
+*.tsbuildinfo
+coverage/
+.DS_Store
+.vercel/
+.aws/

@@ -1,0 +1,44 @@
+[
+  {
+    "file": "NotoSans-400-normal.woff2",
+    "bytes": 48244,
+    "glyphs": 1043,
+    "upstream": "notosans-NotoSans[wdth,wght].ttf",
+    "upstream_sha256": "bfb7bb691513f12e734dc346c03a03f784912432d7e3fa8e56efcf906fe86b3d"
+  },
+  {
+    "file": "NotoSans-500-normal.woff2",
+    "bytes": 50976,
+    "glyphs": 1043,
+    "upstream": "notosans-NotoSans[wdth,wght].ttf",
+    "upstream_sha256": "bfb7bb691513f12e734dc346c03a03f784912432d7e3fa8e56efcf906fe86b3d"
+  },
+  {
+    "file": "NotoSans-600-normal.woff2",
+    "bytes": 51164,
+    "glyphs": 1043,
+    "upstream": "notosans-NotoSans[wdth,wght].ttf",
+    "upstream_sha256": "bfb7bb691513f12e734dc346c03a03f784912432d7e3fa8e56efcf906fe86b3d"
+  },
+  {
+    "file": "NotoSans-700-normal.woff2",
+    "bytes": 50576,
+    "glyphs": 1043,
+    "upstream": "notosans-NotoSans[wdth,wght].ttf",
+    "upstream_sha256": "bfb7bb691513f12e734dc346c03a03f784912432d7e3fa8e56efcf906fe86b3d"
+  },
+  {
+    "file": "NotoSerif-400-normal.woff2",
+    "bytes": 49048,
+    "glyphs": 1043,
+    "upstream": "notoserif-NotoSerif[wdth,wght].ttf",
+    "upstream_sha256": "4d8e6761424656867019081a1a01336f3cb086982682698714054fc33f782713"
+  },
+  {
+    "file": "NotoSerif-400-italic.woff2",
+    "bytes": 53436,
+    "glyphs": 1042,
+    "upstream": "notoserif-NotoSerif-Italic[wdth,wght].ttf",
+    "upstream_sha256": "e87acbc6c0efd0d9a20d6a8cbbda2b266c14be3a3a6f5af8ec9d7b2460570ad1"
+  }
+]

@@ -1,0 +1,187 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AUREL regional restaurant API
+Parameters:
+  FrontendOrigin:
+    Type: String
+    Description: Exact https Amplify origin without trailing slash
+    AllowedPattern: 'https://[A-Za-z0-9.-]+'
+  SenderEmail:
+    Type: String
+    Description: Real email you own - SES sends a verification email
+    AllowedPattern: '[^@ ]+@[^@ ]+\.[^@ ]+'
+Resources:
+  Table:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: pk, AttributeType: S }
+        - { AttributeName: sk, AttributeType: S }
+      KeySchema:
+        - { AttributeName: pk, KeyType: HASH }
+        - { AttributeName: sk, KeyType: RANGE }
+      SSESpecification: { SSEEnabled: true }
+      PointInTimeRecoverySpecification: { PointInTimeRecoveryEnabled: true }
+      TimeToLiveSpecification: { AttributeName: expires, Enabled: true }
+  Media:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules: [{ ObjectOwnership: BucketOwnerEnforced }]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins: [!Ref FrontendOrigin]
+            AllowedMethods: [PUT, GET, HEAD]
+            AllowedHeaders: ['Content-Type', 'Content-Length', 'x-amz-*']
+            MaxAge: 300
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireUnmanagedDemoUploads
+            Status: Enabled
+            Prefix: uploads/
+            ExpirationInDays: 30
+  MediaPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Media
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource: [!GetAtt Media.Arn, !Sub '${Media.Arn}/*']
+            Condition: { Bool: { 'aws:SecureTransport': 'false' } }
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub '${AWS::StackName}-admins'
+      UsernameAttributes: [email]
+      AutoVerifiedAttributes: [email]
+      AdminCreateUserConfig: { AllowAdminCreateUserOnly: true }
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 14
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      AccountRecoverySetting:
+        RecoveryMechanisms: [{ Name: verified_email, Priority: 1 }]
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows: [ALLOW_USER_PASSWORD_AUTH, ALLOW_REFRESH_TOKEN_AUTH]
+      PreventUserExistenceErrors: ENABLED
+      EnableTokenRevocation: true
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 1
+      TokenValidityUnits: { AccessToken: hours, IdToken: hours, RefreshToken: days }
+  AdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      UserPoolId: !Ref UserPool
+      GroupName: admin
+      Description: Restaurant operators
+  EmailIdentity:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref SenderEmail
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: '$default'
+      CorsConfiguration:
+        AllowOrigins: [!Ref FrontendOrigin]
+        AllowMethods: [GET, POST, PATCH, DELETE, OPTIONS]
+        AllowHeaders: [Content-Type, Authorization]
+      DefaultRouteSettings: { ThrottlingBurstLimit: 20, ThrottlingRateLimit: 10 }
+      Auth:
+        DefaultAuthorizer: CognitoAdmin
+        Authorizers:
+          CognitoAdmin:
+            IdentitySource: '$request.header.Authorization'
+            JwtConfiguration:
+              issuer: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}'
+              audience: [!Ref UserPoolClient]
+  FunctionLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-api'
+      RetentionInDays: 14
+  Function:
+    Type: AWS::Serverless::Function
+    DependsOn: FunctionLog
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-api'
+      CodeUri: ../dist/lambda/
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures: [arm64]
+      MemorySize: 256
+      Timeout: 20
+      Environment:
+        Variables:
+          DATA_MODE: aws
+          TABLE_NAME: !Ref Table
+          MEDIA_BUCKET: !Ref Media
+          SES_FROM: !Ref SenderEmail
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref Table }
+        - Statement:
+            - Effect: Allow
+              Action: [s3:PutObject, s3:GetObject]
+              Resource: !Sub '${Media.Arn}/uploads/*'
+            - Effect: Allow
+              Action: [ses:SendEmail]
+              Resource: !Sub 'arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${SenderEmail}'
+      Events:
+        Menu:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+            Path: /menu
+            Method: GET
+            Auth: { Authorizer: NONE }
+        Reservation:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+            Path: /reservations
+            Method: POST
+            Auth: { Authorizer: NONE }
+        Contact:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+            Path: /contact
+            Method: POST
+            Auth: { Authorizer: NONE }
+        Admin:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+            Path: '/admin/{proxy+}'
+            Method: ANY
+Outputs:
+  ApiUrl: { Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com' }
+  TableName: { Value: !Ref Table }
+  MediaBucket: { Value: !Ref Media }
+  UserPoolId: { Value: !Ref UserPool }
+  CognitoClientId: { Value: !Ref UserPoolClient }

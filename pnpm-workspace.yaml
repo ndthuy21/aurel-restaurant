@@ -1,0 +1,7 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+
+# Next 15 pins an older PostCSS; keep the patched release throughout the tree.
+overrides:
+  postcss: ^8.5.32

@@ -1,0 +1,8 @@
+node_modules/
+.next/
+.data/
+dist/
+.aws-sam/
+.env*
+pnpm-lock.yaml
+*.tsbuildinfo

@@ -29,11 +29,22 @@ Mở [website local](http://127.0.0.1:3000/) hoặc [trang admin local](http://1
 
 ## Kiến trúc AWS
 
-- **Amplify Hosting** chạy giao diện Next.js và các route trung gian của trang admin.
-- **API Gateway → Lambda → DynamoDB** xử lý yêu cầu. Khi khách đặt bàn, DynamoDB lưu yêu cầu và cập nhật sức chứa cùng một giao dịch.
-- **Cognito** xác thực tài khoản quản trị. Ảnh tải lên nằm trong **S3 riêng tư** và được đọc qua URL ký có thời hạn.
-- **SES** thử gửi email tiếp nhận sau khi yêu cầu đã lưu. Trong chế độ sandbox, việc gửi thư bị giới hạn theo danh tính đã xác minh.
-- **CloudWatch** hỗ trợ theo dõi log và lỗi của hệ thống.
+```mermaid
+flowchart TD
+    Guest["Khách"] -->|Giao diện và ảnh món| Web["AWS Amplify Hosting · Next.js"]
+    Guest -->|Thực đơn, đặt bàn, liên hệ| API["Amazon API Gateway · HTTP API"]
+    Admin["Nhân viên"] -->|Dashboard và tải ảnh| Web
+    Web -->|Đăng nhập| Auth["Amazon Cognito"]
+    Web -->|Yêu cầu admin kèm access token| API
+    Web -->|Tra cứu ảnh món| API
+    API -->|Gọi backend| Lambda["AWS Lambda"]
+    Lambda -->|Đọc, ghi dữ liệu| DB[("Amazon DynamoDB")]
+    Lambda -->|Lưu ảnh và tạo URL đọc| Media[("Amazon S3 riêng tư")]
+    Lambda -->|Gửi thư sau khi lưu yêu cầu| SES["Amazon SES"]
+    Lambda -->|Log và chỉ số| Logs["Amazon CloudWatch"]
+```
+
+API Gateway xác thực token quản trị, sau đó Lambda kiểm tra nhóm `admin`. Khi đặt bàn, DynamoDB lưu yêu cầu và cập nhật sức chứa trong cùng một giao dịch. Với ảnh tải lên, trình duyệt đọc tệp từ S3 qua URL ký có thời hạn.
 
 ## Triển khai
 
@@ -52,6 +63,12 @@ pnpm test:smoke
 ```
 
 `pnpm check` kiểm tra TypeScript, chạy bộ test và build gói Lambda. Smoke test chạy trên bản production cục bộ và thử các luồng như đăng nhập, lưu đặt bàn và tải ảnh món.
+
+## Lưu ý khi dùng demo và triển khai
+
+- **Dữ liệu demo:** Thực đơn, giá và thông tin nhà hàng là dữ liệu mẫu. Dùng thông tin giả khi thử form đặt bàn.
+- **Email SES:** Mã yêu cầu cho biết hệ thống đã tiếp nhận. Nhân viên xác nhận bàn trong dashboard. Khi SES còn ở sandbox, hãy dùng địa chỉ đã xác minh hoặc SES mailbox simulator. Lỗi gửi thư không làm mất yêu cầu đã lưu.
+- **Cấu hình:** Dùng `.env.local` cho dữ liệu và tài khoản thử trên máy. Khi triển khai AWS, cập nhật đúng `FrontendOrigin`, dùng tài khoản admin Cognito và giữ thông tin đăng nhập ngoài repository.
 
 ## Giấy phép và nguồn ảnh
 

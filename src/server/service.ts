@@ -7,13 +7,14 @@ import {
   ApiError,
   reservationSchema,
   contactSchema,
-  menuSchema,
+  menuSaveSchema,
   mediaSchema,
   statusSchema,
   type Reservation,
 } from '../lib/schema';
 import { getStore, type Store } from './store';
 import type { MenuItem } from '../lib/data';
+import { saveMenuPhoto, signedMenuPhoto, visibleMenuPhoto } from './menu-photo';
 export type Context = { admin: boolean; ip: string };
 export async function notify(email: string, id: string) {
   if (process.env.DATA_MODE !== 'aws' || !process.env.SES_FROM) return;
@@ -48,6 +49,11 @@ export async function service(
 ) {
   if (path.startsWith('/admin') && !ctx.admin)
     throw new ApiError(401, 'Vui lòng đăng nhập bằng tài khoản admin');
+  if (method === 'GET' && /^\/(admin\/)?menu-image\//.test(path)) {
+    const adminRoute = path.startsWith('/admin/');
+    const photo = await visibleMenuPhoto(adminRoute ? path.slice(6) : path, adminRoute, store);
+    return { url: await signedMenuPhoto(photo.key) };
+  }
   if (method === 'GET' && path === '/menu')
     return (await store.list<MenuItem>('menu')).filter((x) => x.available);
   if (method === 'POST' && (path === '/reservations' || path === '/contact')) {
@@ -80,7 +86,16 @@ export async function service(
   if (method === 'GET' && path === '/admin/contacts') return store.list('contacts');
   if (method === 'GET' && path === '/admin/menu') return store.list<MenuItem>('menu');
   if (method === 'POST' && path === '/admin/menu') {
-    const item = menuSchema.parse(body);
+    const { imageUpload, ...item } = menuSaveSchema.parse(body);
+    if (imageUpload) {
+      item.image = await saveMenuPhoto(item.id, imageUpload);
+      delete item.photo;
+    } else if (item.image.startsWith('/api/menu-image/')) {
+      const existing = await store.get<MenuItem>('menu', item.id);
+      if (existing?.image !== item.image)
+        throw new ApiError(400, 'Ảnh tải lên không thuộc món ăn này.');
+      delete item.photo;
+    }
     await store.put('menu', item);
     return item;
   }

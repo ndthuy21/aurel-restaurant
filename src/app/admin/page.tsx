@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowUpRight,
   ArrowLeft,
@@ -16,8 +16,9 @@ import {
   LayoutDashboard,
 } from 'lucide-react';
 import { Brand } from '@/components/chrome';
+import { MenuImagePicker } from '@/components/menu-image-picker';
 import { api } from '@/lib/client';
-import { categories, money, seedMenu, type MenuItem } from '@/lib/data';
+import { categories, money, type MenuItem } from '@/lib/data';
 import type { Reservation, Contact } from '@/lib/schema';
 const blank: MenuItem = {
   id: '',
@@ -29,6 +30,18 @@ const blank: MenuItem = {
   vegetarian: false,
   image: '/images/plate.svg',
 };
+function fileBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Không đọc được ảnh đã chọn.'));
+    reader.onload = () => {
+      const result = String(reader.result);
+      resolve(result.slice(result.indexOf(',') + 1));
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function Admin() {
   const [session, setSession] = useState<'loading' | 'guest' | 'admin'>('loading');
   const [tab, setTab] = useState('overview');
@@ -40,6 +53,16 @@ export default function Admin() {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<MenuItem | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const editor = useRef<HTMLFormElement>(null);
+  const editingId = editing?.id;
+  useEffect(() => {
+    if (editingId) editor.current?.scrollIntoView({ block: 'start' });
+  }, [editingId]);
+  function editDish(item: MenuItem) {
+    setImageFile(null);
+    setEditing(item);
+  }
   const [deleting, setDeleting] = useState('');
   const [media, setMedia] = useState('');
   const [notice, setNotice] = useState('');
@@ -125,7 +148,14 @@ export default function Admin() {
     setBusy(true);
     setError('');
     try {
-      await api('/admin/menu', { method: 'POST', body: JSON.stringify(editing) });
+      const imageUpload = imageFile
+        ? { contentType: imageFile.type, data: await fileBase64(imageFile) }
+        : undefined;
+      await api('/admin/menu', {
+        method: 'POST',
+        body: JSON.stringify({ ...editing, imageUpload }),
+      });
+      setImageFile(null);
       setEditing(null);
       setNotice('Đã lưu món ăn.');
       await refresh();
@@ -425,18 +455,18 @@ export default function Admin() {
               <p>{menu.length} món trong thực đơn</p>
               <button
                 className="button gold small"
-                onClick={() =>
-                  setEditing({ ...blank, id: 'dish-' + crypto.randomUUID().slice(0, 8) })
-                }
+                onClick={() => editDish({ ...blank, id: 'dish-' + crypto.randomUUID() })}
               >
                 <Plus size={16} />
                 Thêm món
               </button>
             </div>
             {editing && (
-              <form className="form admin-editor" onSubmit={save}>
+              <form className="form admin-editor" ref={editor} onSubmit={save}>
                 <div className="panel-title">
-                  <h2>Biên tập món ăn</h2>
+                  <h2>
+                    {menu.some((item) => item.id === editing.id) ? 'Sửa món ăn' : 'Thêm món mới'}
+                  </h2>
                   <button
                     type="button"
                     className="icon-button"
@@ -464,7 +494,7 @@ export default function Admin() {
                       required
                       min={0}
                       max={100000000}
-                      step={1000}
+                      step={1}
                       value={editing.price}
                       onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })}
                     />
@@ -482,30 +512,14 @@ export default function Admin() {
                       ))}
                     </select>
                   </label>
-                  <label>
-                    Ảnh món ăn
-                    <select
-                      value={editing.image}
-                      onChange={(e) =>
-                        setEditing({
-                          ...editing,
-                          image: e.target.value,
-                          photo: seedMenu.find((item) => item.image === e.target.value)?.photo,
-                        })
-                      }
-                    >
-                      {seedMenu.map((item) => (
-                        <option key={item.image} value={item.image}>
-                          {item.name}
-                        </option>
-                      ))}
-                      {['plate', 'garden', 'duck', 'dessert', 'drink'].map((c) => (
-                        <option key={c} value={'/images/' + c + '.svg'}>
-                          Minh họa: {c}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <MenuImagePicker
+                    key={editing.id}
+                    value={editing.image}
+                    file={imageFile}
+                    onFileChange={setImageFile}
+                    disabled={busy}
+                    onChange={({ image, photo }) => setEditing({ ...editing, image, photo })}
+                  />
                   <label className="wide">
                     Mô tả
                     <textarea
@@ -534,7 +548,7 @@ export default function Admin() {
                   </label>
                 </div>
                 <button className="button gold" disabled={busy}>
-                  Lưu món ăn
+                  {busy ? 'Đang lưu…' : 'Lưu món ăn'}
                 </button>
               </form>
             )}
@@ -551,7 +565,7 @@ export default function Admin() {
                   <button
                     className="icon-button"
                     aria-label={'Sửa ' + m.name}
-                    onClick={() => setEditing({ ...m })}
+                    onClick={() => editDish({ ...m })}
                   >
                     <Pencil size={17} />
                   </button>

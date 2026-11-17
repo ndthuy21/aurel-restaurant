@@ -1,24 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { readFile } from 'node:fs/promises';
 import { z } from 'zod';
 import { login, localAdmin, cookieName, revoke } from '@/server/auth';
 import { service, errorResponse } from '@/server/service';
 import { ApiError } from '@/lib/schema';
 import { assertOrigin } from '@/server/http';
+import { MENU_IMAGE_MAX_REQUEST } from '@/lib/menu-image';
+import { getStore } from '@/server/store';
+import { localMenuPhotoPath, rasterType, visibleMenuPhoto } from '@/server/menu-photo';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const attempts = new Map<string, { count: number; until: number }>();
+
+async function readBody(req: NextRequest, limit: number) {
+  if (!req.body) return '';
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > limit) {
+      await reader.cancel().catch(() => {});
+      throw new ApiError(413, 'Yêu cầu quá lớn');
+    }
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks, size).toString('utf8');
+}
+
+async function menuImage(path: string, token?: string) {
+  const headers = { 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' };
+  if (process.env.DATA_MODE === 'aws') {
+    const base = process.env.API_BASE_URL;
+    const options = { cache: 'no-store' as const, signal: AbortSignal.timeout(10000) };
+    let result = token
+      ? await fetch(base + '/admin' + path, {
+          ...options,
+          headers: { Authorization: 'Bearer ' + token },
+        })
+      : await fetch(base + path, options);
+    if (token && [401, 403].includes(result.status)) {
+      await result.body?.cancel();
+      result = await fetch(base + path, options);
+    }
+    if (result.status === 404) throw new ApiError(404, 'Không tìm thấy ảnh món ăn.');
+    if (!result.ok) throw new ApiError(502, 'Không thể tải ảnh món ăn.');
+    const { url } = (await result.json()) as { url: string };
+    return new NextResponse(null, { status: 302, headers: { ...headers, Location: url } });
+  }
+  const photo = await visibleMenuPhoto(path, await localAdmin(token), getStore());
+  const data = await readFile(localMenuPhotoPath(photo.key));
+  const type = rasterType(data);
+  if (!type) throw new ApiError(404, 'Không tìm thấy ảnh món ăn.');
+  return new NextResponse(new Uint8Array(data), { headers: { ...headers, 'Content-Type': type } });
+}
+
 async function handler(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   try {
     const path = '/' + (await params).path.join('/');
     const method = req.method;
+    const limit = method === 'POST' && path === '/admin/menu' ? MENU_IMAGE_MAX_REQUEST : 16384;
     if (!['GET', 'HEAD'].includes(method)) {
       assertOrigin(req.headers.get('origin'), req.headers.get('host'), req.nextUrl.protocol);
-      if (Number(req.headers.get('content-length') || 0) > 16384)
+      if (Number(req.headers.get('content-length') || 0) > limit)
         throw new ApiError(413, 'Yêu cầu quá lớn');
     }
     const jar = await cookies();
     const token = jar.get(cookieName)?.value;
+    if (path.startsWith('/menu-image/') && method === 'GET') return await menuImage(path, token);
+    if (path.startsWith('/admin/') && !token) throw new ApiError(401, 'Vui lòng đăng nhập');
     if (path === '/auth/logout' && method === 'POST') {
       if (token) await revoke(token);
       jar.delete(cookieName);
@@ -26,8 +79,7 @@ async function handler(req: NextRequest, { params }: { params: Promise<{ path: s
     }
     let body: unknown = undefined;
     if (!['GET', 'HEAD', 'DELETE'].includes(method)) {
-      const raw = await req.text();
-      if (Buffer.byteLength(raw, 'utf8') > 16384) throw new ApiError(413, 'Yêu cầu quá lớn');
+      const raw = await readBody(req, limit);
       try {
         body = JSON.parse(raw);
       } catch {

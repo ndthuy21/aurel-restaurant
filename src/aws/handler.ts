@@ -1,6 +1,7 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { service, errorResponse } from '../server/service';
 import { ApiError } from '../lib/schema';
+import { MENU_IMAGE_MAX_REQUEST } from '../lib/menu-image';
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
   try {
     const path = event.rawPath;
@@ -18,7 +19,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     const raw = event.isBase64Encoded
       ? Buffer.from(event.body || '', 'base64').toString()
       : event.body;
-    if (raw && Buffer.byteLength(raw) > 16384) throw new ApiError(413, 'Yêu cầu quá lớn');
+    const limit =
+      event.requestContext.http.method === 'POST' && path === '/admin/menu'
+        ? MENU_IMAGE_MAX_REQUEST
+        : 16384;
+    if (raw && Buffer.byteLength(raw) > limit) throw new ApiError(413, 'Yêu cầu quá lớn');
     let body: unknown;
     try {
       body = raw ? JSON.parse(raw) : undefined;

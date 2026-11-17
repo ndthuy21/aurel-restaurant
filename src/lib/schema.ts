@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MENU_IMAGE_MAX_BASE64, MENU_IMAGE_TYPES, parseMenuImage } from './menu-image';
 import { categories, seedMenu, times, todayVN } from './data';
 const clean = z.string().trim();
 export const reservationSchema = z
@@ -50,8 +51,8 @@ export const menuSchema = z.object({
         '/images/dessert.svg',
         '/images/drink.svg',
         ...seedMenu.map((item) => item.image),
-      ].includes(path),
-    'Chọn ảnh món ăn có trong thư viện',
+      ].includes(path) || (path.startsWith('/api/') && Boolean(parseMenuImage(path.slice(4)))),
+    'Chọn ảnh từ thư viện hoặc tải ảnh món ăn lên',
   ),
   photo: z
     .object({
@@ -62,6 +63,14 @@ export const menuSchema = z.object({
       licenseUrl: z
         .url()
         .refine((url) => /^https:\/\/(creativecommons\.org|commons\.wikimedia\.org)\//.test(url)),
+    })
+    .optional(),
+});
+export const menuSaveSchema = menuSchema.extend({
+  imageUpload: z
+    .object({
+      contentType: z.enum(MENU_IMAGE_TYPES),
+      data: z.string().min(1).max(MENU_IMAGE_MAX_BASE64),
     })
     .optional(),
 });

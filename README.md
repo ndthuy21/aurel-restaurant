@@ -49,6 +49,12 @@ Port 3000 phải trống để chạy web; 3100 phải trống cho smoke test. T
 
 Đặt bàn mới là **yêu cầu chờ xác nhận**. Thông báo gửi thành công không đồng nghĩa bàn đã được xác nhận. Không có thanh toán hoặc đặt bàn tại nhà hàng ngoài đời thực.
 
+### Thêm món và chọn ảnh
+
+Trong **Quản trị → Thực đơn**, chọn **Thêm món** hoặc **Sửa món**. Chọn ảnh từ thư viện có hình thu nhỏ, hoặc tải ảnh JPG, PNG hay WebP tối đa 2 MB. Xem trước ảnh, bật **Đang phục vụ** rồi bấm **Lưu món ăn** để công bố món.
+
+Trong chế độ AWS, ảnh món lưu trong prefix riêng `menu-images/` của bucket S3. Khi khách mở ảnh của món đang phục vụ, ứng dụng xác minh ảnh gắn với món và trả về URL đọc có thời hạn. Ở chế độ local, ảnh lưu cùng thư mục dữ liệu. Tab **Thư viện S3** dùng prefix thử nghiệm `uploads/` và có vòng đời riêng.
+
 ## 3. Kiến trúc
 
 ```mermaid
@@ -192,7 +198,7 @@ Thao tác này cập nhật cả CORS API Gateway và S3. Redeploy frontend nế
 3. Đăng nhập admin thuộc group; xác nhận đặt bàn, tải lại trang và đối chiếu database.
 4. User không thuộc group và token hết hạn phải bị từ chối; public không đọc được danh sách đặt bàn/lời nhắn.
 5. Thêm/sửa/ẩn/xóa món; trang menu phản ánh dữ liệu API.
-6. Tải một ảnh thử qua tab S3; PUT thành công và preview hiển thị. Bucket không có public read. Ảnh upload chưa tự gắn vào gallery/menu; ảnh mẫu hiện tại là asset trong source. Upload mẫu bị lifecycle xóa sau 30 ngày.
+6. Tải một ảnh thử qua tab S3; PUT thành công và preview hiển thị. Bucket không có public read. Ảnh tải qua tab S3 là ảnh thử, tự hết hạn sau 30 ngày. Để gắn ảnh vào món, tải từ form Thêm món hoặc Sửa món.
 7. Kiểm tra CloudWatch log của Lambda và build/SSR log của Amplify, không chỉ dựa vào thông báo frontend.
 
 ## 8. API
@@ -211,7 +217,7 @@ Local base `/api`; AWS base `ApiUrl`. Body/response JSON, lỗi `{ "error": "...
 | PATCH  | `/admin/reservations/{uuid}` | Admin        | `{status: pending/confirmed/cancelled}`                |
 | GET    | `/admin/contacts`            | Admin        | Danh sách lời nhắn                                     |
 | GET    | `/admin/menu`                | Admin        | Cả món đang hiện và đã ẩn                              |
-| POST   | `/admin/menu`                | Admin        | Tạo/cập nhật toàn bộ món theo ID                       |
+| POST   | `/admin/menu`                | Admin        | Tạo/cập nhật món theo ID, nhận ảnh tùy chọn                       |
 | DELETE | `/admin/menu/{id}`           | Admin        | Xóa món                                                |
 | POST   | `/admin/media`               | Admin, AWS   | `{contentType,size}` → URL PUT 2 phút, preview 15 phút |
 

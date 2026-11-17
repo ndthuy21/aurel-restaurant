@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -126,7 +126,31 @@ try {
   check((await request('/admin/menu', { method: 'POST', body: dish, token })).r.status, 200);
   check((await request('/admin/menu', { token })).data.length, 101);
   check((await request('/menu')).data.length, 100);
+
+  const photo = await readFile(join('public', dish.image));
+  const imageUpload = { contentType: 'image/webp', data: photo.toString('base64') };
+  const saveDish = (body, auth = token) =>
+    request('/admin/menu', { method: 'POST', token: auth, body });
+  check((await saveDish({ ...dish, imageUpload }, '')).r.status, 401);
+  check(
+    (await saveDish({ ...dish, imageUpload: { ...imageUpload, data: 'PHN2Zz4=' } })).r.status,
+    400,
+  );
+  const saved = await saveDish({ ...dish, imageUpload });
+  check(saved.r.status, 200);
+  assert.match(saved.data.image, /^\/api\/menu-image\/smoke-dish\/[0-9a-f-]+$/);
+  check(saved.data.photo, undefined);
+  check(saved.data.imageUpload, undefined);
+  check((await fetch(base + saved.data.image)).status, 404);
+  const privatePreview = await fetch(base + saved.data.image, { headers: { Cookie: token } });
+  check(privatePreview.headers.get('content-type'), 'image/webp');
+  check(Buffer.from(await privatePreview.arrayBuffer()), photo);
+  check((await saveDish({ ...saved.data, id: 'unrelated-dish' })).r.status, 400);
+  check((await saveDish({ ...saved.data, available: true })).r.status, 200);
+  check((await request('/menu')).data.find((item) => item.id === dish.id).image, saved.data.image);
+  check(Buffer.from(await (await fetch(base + saved.data.image)).arrayBuffer()), photo);
   check((await request('/admin/menu/smoke-dish', { method: 'DELETE', token })).r.status, 200);
+  check((await fetch(base + saved.data.image)).status, 404);
   check(
     (
       await request('/contact', {

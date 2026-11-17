@@ -1396,6 +1396,7 @@ td select {
 }
 .admin-editor {
   padding: 30px;
+  scroll-margin-top: 80px;
   background: #1d241a;
   border: 1px solid #c5a77955;
   margin-bottom: 30px;
@@ -1408,6 +1409,96 @@ td select {
 }
 .admin-editor .button {
   align-self: flex-start;
+}
+.menu-image-picker {
+  min-width: 0;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+}
+.menu-image-picker legend {
+  padding-inline: 5px;
+}
+.menu-image-current {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.menu-image-current img {
+  width: 112px;
+  height: 84px;
+  object-fit: cover;
+}
+.menu-image-current strong {
+  display: block;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+.menu-image-upload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.menu-image-upload .menu-image-file-label {
+  position: relative;
+  flex-direction: row;
+  cursor: pointer;
+}
+.menu-image-file-label:has(input:focus-visible) {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+.menu-image-picker details > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 10px 0;
+  cursor: pointer;
+  color: var(--gold);
+}
+.menu-image-picker details > p {
+  margin: 8px 0;
+}
+.menu-image-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 114px), 1fr));
+  gap: 8px;
+  max-height: 370px;
+  overflow: auto;
+  padding: 3px;
+}
+.menu-image-picker .menu-image-option {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #151b13;
+  cursor: pointer;
+}
+.menu-image-option img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.menu-image-option span {
+  display: block;
+  padding: 7px;
+}
+.menu-image-option:hover,
+.menu-image-option:has(input:checked) {
+  border-color: var(--gold);
+}
+.menu-image-option:has(input:checked) span {
+  color: var(--gold);
+}
+.menu-image-option:has(input:focus-visible) {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
 }
 .message-grid {
   display: grid;

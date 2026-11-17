@@ -149,6 +149,9 @@ Resources:
               Action: [s3:PutObject, s3:GetObject]
               Resource: !Sub '${Media.Arn}/uploads/*'
             - Effect: Allow
+              Action: [s3:PutObject, s3:GetObject]
+              Resource: !Sub '${Media.Arn}/menu-images/*'
+            - Effect: Allow
               Action: [ses:SendEmail]
               Resource: !Sub 'arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${SenderEmail}'
       Events:
@@ -157,6 +160,13 @@ Resources:
           Properties:
             ApiId: !Ref Api
             Path: /menu
+            Method: GET
+            Auth: { Authorizer: NONE }
+        MenuImage:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+            Path: /menu-image/{dishId}/{version}
             Method: GET
             Auth: { Authorizer: NONE }
         Reservation:
